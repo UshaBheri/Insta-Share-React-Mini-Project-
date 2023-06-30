@@ -1,8 +1,9 @@
 import {Component} from 'react'
+import {Redirect} from 'react-router-dom'
 import Cookies from 'js-cookie'
 import './index.css'
 
-class Login extends Component {
+class LoginForm extends Component {
   state = {
     username: '',
     password: '',
@@ -20,7 +21,11 @@ class Login extends Component {
 
   onSubmitSuccess = jwtToken => {
     const {history} = this.props
-    Cookies.set('jwt_token', jwtToken, {expires: 30})
+
+    Cookies.set('jwt_token', jwtToken, {
+      expires: 30,
+      path: '/',
+    })
     history.replace('/')
   }
 
@@ -42,41 +47,43 @@ class Login extends Component {
     if (response.ok === true) {
       this.onSubmitSuccess(data.jwt_token)
     } else {
-      this.onSubmitFailure(data.errorMsg)
+      this.onSubmitFailure(data.error_msg)
     }
   }
 
-  renderUsername = () => {
-    const {username} = this.state
-    return (
-      <>
-        <label htmlFor="username" className="label">
-          USERNAME
-        </label>
-        <input
-          type="text"
-          id="username"
-          className="input-text"
-          onChange={this.onChangeUsername}
-          value={username}
-        />
-      </>
-    )
-  }
-
-  renderPassword = () => {
+  renderPasswordField = () => {
     const {password} = this.state
     return (
       <>
-        <label htmlFor="password" className="label">
+        <label className="input-label" htmlFor="password">
           PASSWORD
         </label>
         <input
           type="password"
           id="password"
-          className="input-text"
-          onChange={this.onChangePassword}
+          className="password-input-field"
           value={password}
+          onChange={this.onChangePassword}
+          placeholder="Password:rahul@2021"
+        />
+      </>
+    )
+  }
+
+  renderUsernameField = () => {
+    const {username} = this.state
+    return (
+      <>
+        <label className="input-label" htmlFor="username">
+          USERNAME
+        </label>
+        <input
+          type="text"
+          id="username"
+          className="username-input-field"
+          value={username}
+          onChange={this.onChangeUsername}
+          placeholder="Username:rahul"
         />
       </>
     )
@@ -84,30 +91,35 @@ class Login extends Component {
 
   render() {
     const {showSubmitError, errorMsg} = this.state
+    const jwtToken = Cookies.get('jwt_token')
+    if (jwtToken !== undefined) {
+      return <Redirect to="/" />
+    }
     return (
-      <div className="app-container">
+      <div className="login-container">
         <img
-          src="https://res.cloudinary.com/dwwtoll0q/image/upload/v1655963796/Layer_2_ako4nk.png"
-          className="logo"
-          alt="website logo"
+          src="https://res.cloudinary.com/dziwdneks/image/upload/v1675418435/login_img_poyp5d.png"
+          className="login-website-desktop-img"
+          alt="website login"
         />
-        <form className="myForm" onSubmit={this.submitForm}>
+
+        <form className="form-container" onSubmit={this.submitForm}>
           <img
-            src="https://res.cloudinary.com/dwwtoll0q/image/upload/v1655963796/Layer_2_ako4nk.png"
-            className="logo"
+            src="https://res.cloudinary.com/dziwdneks/image/upload/v1675419223/login_icon_ekrs85.png"
+            className="login-website-logo-image"
             alt="website logo"
           />
-          <h1 className="heading">Insta Share</h1>
-          <div className="input-container">{this.renderUsername()}</div>
-          <div className="input-container">{this.renderPassword()}</div>
-          <button type="submit" className="button">
+          <h1 className="website-title">Insta Share</h1>
+          <div className="input-container">{this.renderUsernameField()}</div>
+          <div className="input-container">{this.renderPasswordField()}</div>
+          <button type="submit" className="login-button">
             Login
           </button>
-          {showSubmitError && <p className="error-msg">{errorMsg}</p>}
+          {showSubmitError && <p className="error-message">*{errorMsg}</p>}
         </form>
       </div>
     )
   }
 }
 
-export default Login
+export default LoginForm
